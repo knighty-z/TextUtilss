@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TextUtils — A clean, private, browser-based text editor and formatting utility.">
+  <title>TextUtils</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation -->
+  <header class="topbar" id="top">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <a href="#workspace" class="brand" id="brandLogo" aria-label="TextUtils">
+          <span class="brand-mark" aria-hidden="true">T</span>
+          <span class="brand-name">TextUtils</span>
+        </a>
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-subtitle">Local text editor &amp; utilities</span>
+      </div>
+
+      <nav class="topbar-nav" aria-label="Navigation">
+        <a href="#workspace" class="nav-link">Editor</a>
+        <a href="#about" class="nav-link">About</a>
+      </nav>
+
+      <div class="topbar-actions">
+        <button type="button" class="btn-ghost btn-sm requires-text" id="navClearBtn" disabled title="Clear all text in the editor">
+          Reset
+        </button>
+        <button type="button" class="btn-outline btn-sm theme-btn" id="themeToggle" aria-label="Switch to dark theme" title="Toggle light or dark theme">
+          <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+          <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2m-7.07-15.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2m-15.66 5.66-1.41 1.41m12.73-12.73-1.41 1.41"></path>
+          </svg>
+          <span id="themeLabel">Dark</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Primary First-Viewport Workspace -->
+    <section class="workspace-wrap" id="workspace" aria-label="TextUtils Workspace">
+      <div class="container workspace-shell">
+
+        <!-- Tool Category Tabs & Inline Utility Toggles -->
+        <div class="ribbon-header">
+          <div class="category-tabs" role="tablist" aria-label="Text tool categories">
+            <button type="button" class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-case" id="tab-case" data-category="case">Case</button>
+            <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-cleanup" id="tab-cleanup" data-category="cleanup">Cleanup</button>
+            <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-transform" id="tab-transform" data-category="transform">Transform</button>
+            <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-format" id="tab-format" data-category="format">Format</button>
+          </div>
+
+          <div class="utility-toggles" aria-label="Interactive utilities">
+            <button type="button" class="utility-toggle-btn" id="toggleFindReplaceBtn" aria-expanded="false" aria-controls="drawerFindReplace" title="Find and replace text (Ctrl+F)">
+              Find &amp; Replace
+            </button>
+            <button type="button" class="utility-toggle-btn" id="toggleDedupeWordsBtn" aria-expanded="false" aria-controls="drawerDedupeWords" title="Remove repeated words">
+              Duplicate Words
+            </button>
+            <button type="button" class="utility-toggle-btn" id="toggleListConverterBtn" aria-expanded="false" aria-controls="drawerListConverter" title="Convert text to a formatted list">
+              Text to List
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Category Tool Strip (Always visible in first viewport) -->
+        <div class="tools-strip" aria-live="polite">
+          <!-- Case Tools -->
+          <div class="tool-group" id="panel-case" role="tabpanel" aria-labelledby="tab-case" data-panel="case">
+            <button type="button" class="tool-btn requires-text" data-tool="uppercase" title="Convert all letters to UPPERCASE">UPPERCASE</button>
+            <button type="button" class="tool-btn requires-text" data-tool="lowercase" title="Convert all letters to lowercase">lowercase</button>
+            <button type="button" class="tool-btn requires-text" data-tool="titlecase" title="Capitalize the first letter of each word">Title Case</button>
+            <button type="button" class="tool-btn requires-text" data-tool="sentencecase" title="Capitalize the first letter of each sentence">Sentence case</button>
+            <button type="button" class="tool-btn requires-text" data-tool="capitalizeeach" title="Capitalize every word and lowercase remaining letters">Capitalize Each Word</button>
+          </div>
+
+          <!-- Cleanup Tools -->
+          <div class="tool-group" id="panel-cleanup" role="tabpanel" aria-labelledby="tab-cleanup" data-panel="cleanup" hidden>
+            <button type="button" class="tool-btn requires-text" data-tool="removeextraspaces" title="Trim edges and collapse consecutive spaces">Remove Extra Spaces</button>
+            <button type="button" class="tool-btn requires-text" data-tool="removeallspaces" title="Remove all whitespace characters">Remove All Spaces</button>
+            <button type="button" class="tool-btn requires-text" data-tool="removeEmptyLines" title="Remove blank and whitespace-only lines">Remove Empty Lines</button>
+            <button type="button" class="tool-btn requires-text" data-tool="removeLineBreaks" title="Join lines using single spaces">Remove Line Breaks</button>
+            <button type="button" class="tool-btn requires-text" data-tool="removePunctuation" title="Strip punctuation while preserving letters and numbers">Remove Punctuation</button>
+            <button type="button" class="tool-btn requires-text" data-tool="removeDuplicateLines" title="Keep first occurrence of each line">Remove Duplicate Lines</button>
+            <button type="button" class="tool-btn requires-text" id="cleanupDedupeWordsShortcut" title="Configure and remove repeated words">Remove Duplicate Words…</button>
+          </div>
+
+          <!-- Transform Tools -->
+          <div class="tool-group" id="panel-transform" role="tabpanel" aria-labelledby="tab-transform" data-panel="transform" hidden>
+            <button type="button" class="tool-btn requires-text" data-tool="reverseText" title="Reverse the entire text character by character">Reverse Text</button>
+            <button type="button" class="tool-btn requires-text" data-tool="reverseEachWord" title="Reverse each word in place">Reverse Each Word</button>
+            <button type="button" class="tool-btn requires-text" data-tool="sortLinesAZ" title="Sort lines alphabetically A to Z">Sort Lines A–Z</button>
+            <button type="button" class="tool-btn requires-text" data-tool="sortLinesZA" title="Sort lines alphabetically Z to A">Sort Lines Z–A</button>
+            <button type="button" class="tool-btn requires-text" data-tool="spacesToUnderscores" title="Replace spaces with underscores (_)">Spaces to Underscores</button>
+            <button type="button" class="tool-btn requires-text" data-tool="spacesToHyphens" title="Replace spaces with hyphens (-)">Spaces to Hyphens</button>
+            <button type="button" class="tool-btn requires-text" data-tool="underscoresToSpaces" title="Replace underscores (_) with spaces">Underscores to Spaces</button>
+            <button type="button" class="tool-btn requires-text" data-tool="addSpacesBetweenChars" title="Insert a space between every character">Space Characters</button>
+          </div>
+
+          <!-- Format Tools -->
+          <div class="tool-group" id="panel-format" role="tabpanel" aria-labelledby="tab-format" data-panel="format" hidden>
+            <button type="button" class="tool-btn requires-text" data-tool="numberedList" title="Format non-empty lines as a numbered list (1. 2. 3.)">Numbered List</button>
+            <button type="button" class="tool-btn requires-text" data-tool="bulletedList" title="Format non-empty lines as a bulleted list">Bulleted List</button>
+            <button type="button" class="tool-btn requires-text" data-tool="addLineNumbers" title="Prefix every line with its line number">Add Line Numbers</button>
+            <button type="button" class="tool-btn requires-text" data-tool="normalizeParagraphs" title="Clean spacing and standardize blank lines between paragraphs">Normalize Paragraphs</button>
+            <button type="button" class="tool-btn requires-text" id="formatListConverterShortcut" title="Convert delimited text into lists">Text to List Converter…</button>
+          </div>
+        </div>
+
+        <!-- Main Editor + Statistics/Limits Grid -->
+        <div class="workspace-grid">
+          <!-- Left: Document Editor -->
+          <div class="editor-surface">
+            <!-- Editor Action Bar -->
+            <div class="editor-bar">
+              <div class="editor-bar-left">
+                <span class="editor-status" id="editorStatus" data-has-text="false">Empty</span>
+                <span class="editor-inline-counts" id="editorInlineCounts">0 words · 0 chars</span>
+              </div>
+
+              <div class="editor-bar-actions" role="toolbar" aria-label="Editor actions">
+                <button type="button" class="action-btn" id="btnPaste" title="Paste from clipboard">Paste</button>
+                <button type="button" class="action-btn" id="btnUndo" disabled title="Undo last action (Ctrl+Z)">Undo</button>
+                <button type="button" class="action-btn" id="btnRedo" disabled title="Redo action (Ctrl+Y)">Redo</button>
+                <span class="action-sep" aria-hidden="true"></span>
+                <button type="button" class="action-btn" id="btnMonoToggle" aria-pressed="false" title="Toggle monospace editor font">Mono</button>
+                <button type="button" class="action-btn requires-text" id="btnSelectAll" disabled title="Select all text">Select All</button>
+                <button type="button" class="action-btn btn-primary-sm requires-text" id="btnCopy" disabled title="Copy text to clipboard">Copy</button>
+                <button type="button" class="action-btn requires-text" id="btnDownload" disabled title="Download as textutils-output.txt">Download</button>
+                <button type="button" class="action-btn action-btn-danger requires-text" id="btnClear" disabled title="Clear editor text">Clear</button>
+              </div>
+            </div>
+
+            <!-- Inline Clear Confirmation Banner (shown only when clearing large text) -->
+            <div class="inline-banner inline-banner-warn" id="clearConfirmBar" hidden role="alert">
+              <span id="clearConfirmMessage">Clear all text from the editor?</span>
+              <div class="inline-banner-actions">
+                <button type="button" class="btn-danger-sm" id="confirmClearBtn">Confirm Clear</button>
+                <button type="button" class="btn-outline btn-xs" id="cancelClearBtn">Cancel</button>
+              </div>
+            </div>
+
+            <!-- Collapsible Inline Drawer 1: Advanced Find & Replace -->
+            <form class="inline-drawer" id="drawerFindReplace" hidden>
+              <div class="drawer-row">
+                <div class="drawer-field">
+                  <label for="findInput" class="sr-only">Find</label>
+                  <input type="text" id="findInput" class="drawer-input" placeholder="Find word or phrase…" autocomplete="off">
+                  <span class="match-pill" id="matchCountBadge">0 matches</span>
+                </div>
+                <div class="drawer-field">
+                  <label for="replaceInput" class="sr-only">Replace with</label>
+                  <input type="text" id="replaceInput" class="drawer-input" placeholder="Replace with…" autocomplete="off">
+                </div>
+                <div class="drawer-checks">
+                  <label class="check-item">
+                    <input type="checkbox" id="matchCaseCheckbox">
+                    <span>Match case</span>
+                  </label>
+                  <label class="check-item">
+                    <input type="checkbox" id="wholeWordCheckbox">
+                    <span>Whole words</span>
+                  </label>
+                </div>
+                <div class="drawer-buttons">
+                  <button type="button" class="btn-outline btn-xs" id="replaceOneBtn" title="Replace next matching occurrence">Replace Next</button>
+                  <button type="submit" class="btn-primary-sm" id="replaceAllBtn">Replace All</button>
+                  <button type="button" class="btn-ghost btn-xs drawer-close" data-close-drawer="drawerFindReplace" aria-label="Close Find and Replace">Close</button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Collapsible Inline Drawer 2: Duplicate Word Remover -->
+            <div class="inline-drawer" id="drawerDedupeWords" hidden>
+              <div class="drawer-row">
+                <span class="drawer-title">Duplicate Word Remover</span>
+                <div class="drawer-checks">
+                  <label class="check-item">
+                    <input type="checkbox" id="dedupeWordsCaseCheckbox">
+                    <span>Case-sensitive</span>
+                  </label>
+                </div>
+                <span class="drawer-note">Removes repeated words while keeping original order.</span>
+                <div class="drawer-buttons">
+                  <button type="button" class="btn-primary-sm requires-text" id="applyDedupeWordsBtn" disabled>Remove Duplicates</button>
+                  <button type="button" class="btn-ghost btn-xs drawer-close" data-close-drawer="drawerDedupeWords" aria-label="Close Duplicate Word Remover">Close</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsible Inline Drawer 3: Text to List Converter -->
+            <div class="inline-drawer" id="drawerListConverter" hidden>
+              <div class="drawer-row">
+                <span class="drawer-title">Text to List</span>
+                <div class="drawer-select-group">
+                  <label for="listSeparatorSelect" class="drawer-label">Split by</label>
+                  <select id="listSeparatorSelect" class="drawer-select">
+                    <option value="auto">Newlines (lines)</option>
+                    <option value="comma">Comma (,)</option>
+                    <option value="space">Spaces</option>
+                    <option value="semicolon">Semicolon (;)</option>
+                    <option value="custom">Custom…</option>
+                  </select>
+                  <input type="text" id="customSeparatorInput" class="drawer-input drawer-input-xs" placeholder="e.g. |" hidden aria-label="Custom separator">
+                </div>
+                <div class="drawer-select-group">
+                  <label for="listOutputFormatSelect" class="drawer-label">Format</label>
+                  <select id="listOutputFormatSelect" class="drawer-select">
+                    <option value="numbered">Numbered list (1. 2. 3.)</option>
+                    <option value="bulleted">Bulleted list (•)</option>
+                    <option value="comma">Comma-separated</option>
+                    <option value="lines">One item per line</option>
+                  </select>
+                </div>
+                <div class="drawer-buttons">
+                  <button type="button" class="btn-primary-sm requires-text" id="applyListConvertBtn" disabled>Convert</button>
+                  <button type="button" class="btn-ghost btn-xs drawer-close" data-close-drawer="drawerListConverter" aria-label="Close Text to List Converter">Close</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Textarea -->
+            <div class="editor-area-wrap">
+              <label for="textEditor" class="sr-only">Text Editor</label>
+              <textarea
+                id="textEditor"
+                class="text-editor"
+                placeholder="Start typing or paste text here…"
+                spellcheck="true"
+              ></textarea>
+            </div>
+
+            <!-- Editor Bottom Bar -->
+            <div class="editor-footer">
+              <div class="editor-feedback" id="editorFeedback" role="status" aria-live="polite">
+                Type or paste text to begin. Everything runs locally in your browser.
+              </div>
+              <button type="button" class="link-btn" id="loadSampleBtn">Load sample text</button>
+            </div>
+          </div>
+
+          <!-- Right: Live Statistics & Character Limits -->
+          <aside class="inspector-panel" aria-label="Text statistics and character limits">
+            <div class="inspector-section">
+              <div class="inspector-heading-row">
+                <h2 class="inspector-heading">Statistics</h2>
+                <span class="inspector-sub">Live</span>
+              </div>
+
+              <dl class="stats-grid">
+                <div class="stat-cell">
+                  <dt>Words</dt>
+                  <dd id="statWords">0</dd>
+                </div>
+                <div class="stat-cell">
+                  <dt>Characters</dt>
+                  <dd id="statChars">0</dd>
+                </div>
+                <div class="stat-cell">
+                  <dt>No Spaces</dt>
+                  <dd id="statNoSpaces">0</dd>
+                </div>
+                <div class="stat-cell">
+                  <dt>Sentences</dt>
+                  <dd id="statSentences">0</dd>
+                </div>
+                <div class="stat-cell">
+                  <dt>Paragraphs</dt>
+                  <dd id="statParagraphs">0</dd>
+                </div>
+                <div class="stat-cell">
+                  <dt>Lines</dt>
+                  <dd id="statLines">0</dd>
+                </div>
+              </dl>
+
+              <div class="reading-time-row">
+                <span class="reading-label">Est. reading time</span>
+                <strong class="reading-value" id="statReadingTime">0 sec</strong>
+              </div>
+            </div>
+
+            <div class="inspector-section inspector-limits">
+              <div class="inspector-heading-row">
+                <h2 class="inspector-heading">Character Limits</h2>
+                <span class="inspector-sub">Editable</span>
+              </div>
+
+              <div class="limits-list">
+                <!-- X Post -->
+                <div class="limit-item" data-limit-key="x">
+                  <div class="limit-top">
+                    <label for="limitInputX" class="limit-name">X Post</label>
+                    <div class="limit-controls">
+                      <span class="limit-remaining" id="limitRemainingX">280 left</span>
+                      <span class="limit-slash">/</span>
+                      <input type="number" id="limitInputX" class="limit-number-input" min="1" max="100000" value="280" aria-label="X post character limit">
+                    </div>
+                  </div>
+                  <div class="limit-track" aria-hidden="true">
+                    <div class="limit-fill" id="limitFillX"></div>
+                  </div>
+                </div>
+
+                <!-- Instagram Caption -->
+                <div class="limit-item" data-limit-key="instagram">
+                  <div class="limit-top">
+                    <label for="limitInputInstagram" class="limit-name">Instagram</label>
+                    <div class="limit-controls">
+                      <span class="limit-remaining" id="limitRemainingInstagram">2,200 left</span>
+                      <span class="limit-slash">/</span>
+                      <input type="number" id="limitInputInstagram" class="limit-number-input" min="1" max="100000" value="2200" aria-label="Instagram caption character limit">
+                    </div>
+                  </div>
+                  <div class="limit-track" aria-hidden="true">
+                    <div class="limit-fill" id="limitFillInstagram"></div>
+                  </div>
+                </div>
+
+                <!-- Custom Limit -->
+                <div class="limit-item" data-limit-key="custom">
+                  <div class="limit-top">
+                    <label for="limitInputCustom" class="limit-name">Custom</label>
+                    <div class="limit-controls">
+                      <span class="limit-remaining" id="limitRemainingCustom">500 left</span>
+                      <span class="limit-slash">/</span>
+                      <input type="number" id="limitInputCustom" class="limit-number-input" min="1" max="100000" value="500" aria-label="Custom character limit">
+                    </div>
+                  </div>
+                  <div class="limit-track" aria-hidden="true">
+                    <div class="limit-fill" id="limitFillCustom"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="inspector-footer">
+              <span>Shortcuts: <kbd>Ctrl</kbd>+<kbd>F</kbd> Find · <kbd>Ctrl</kbd>+<kbd>Z</kbd> Undo</span>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Compact Editorial About Section -->
+    <section class="about-wrap" id="about" aria-labelledby="aboutHeading">
+      <div class="container">
+        <div class="about-grid">
+          <div>
+            <h2 class="about-title" id="aboutHeading">About TextUtils</h2>
+            <p class="about-desc">
+              TextUtils is an everyday browser-based text editor and formatting toolkit. Clean up pasted text, convert casing, build lists, deduplicate words, and track character limits in one fast, distraction-free workspace.
+            </p>
+          </div>
+          <div class="about-points">
+            <div class="about-point">
+              <h3>Private by design</h3>
+              <p>All text transformations execute locally in your browser. Nothing is uploaded or logged.</p>
+            </div>
+            <div class="about-point">
+              <h3>Zero setup</h3>
+              <p>No accounts, no backend, and no distractions—open the page and start editing immediately.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span class="footer-left">TextUtils · Client-side text toolkit</span>
+      <span class="footer-right">&copy; 2026 TextUtils</span>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-region" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
